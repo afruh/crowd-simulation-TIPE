@@ -45,12 +45,14 @@ def charger(terrain):
         L = line.split()
         for y,l in enumerate(L):
             if int(l) == 1 :
-                Var.LSortie.append([x,y])
-            Var.TCase[y,x].type = int(l)
+                Var.TCase[y,x].type = 0
+            else:
+                Var.TCase[y,x].type = int(l)
+
             Var.TCase[y,x].rafraichir()
     save.close()
     return
-    
+
     # Option Éditer
 def remplir_mur() :
     '''Rempli le terrain de mur'''
@@ -59,15 +61,15 @@ def remplir_mur() :
             Var.TCase[y,x].type = -1
             Var.TCase[y,x].rafraichir()
     return
-  
-    
+
+
     # Option Affichage
 def change_mode(nvmode):
     '''Change le mode d'affichage'''
     Var.mode = nvmode
     rafraichir()
     return
-    
+
 def affiche_grille():
     '''Active ou désactive la grille'''
     Var.grilleTerrain = not(Var.grilleTerrain)
@@ -79,30 +81,33 @@ def affiche_grille():
                 Var.TCase[y,x].grille = False
     rafraichir()
     return
-    
-    # Option Aide (Menu4)
-def info():
-    '''Affiche des infos sur le programme'''
-    showinfo("A propos", Var.titre + " par LAM Kevin et MEILAC Adrien")
-    return
-    
-# Panneau latéral gauche
-def change_typePinceau(self):
-    '''Change le type de pinceau entre Carré ou Croix'''
-    if Var.typePinceau :
-        self.config(text = "Croix", command =  lambda : change_typePinceau(self))
+
+def change_typeDiagonale(self):
+    '''Change le type de pinceau entre restreint ou étendu'''
+    if Var.typeDiagonale :
+        self.config(text = "restreint", command =  lambda : change_typeDiagonale(self))
     else :
-        self.config(text = "Carré", command =  lambda : change_typePinceau(self))
-    Var.typePinceau=not(Var.typePinceau)
+        self.config(text = "étendu", command =  lambda : change_typeDiagonale(self))
+    Var.typeDiagonale=not(Var.typeDiagonale)
     self.pack(fill=X)
     return
-    
+
+def change_simulation(self):
+    if Var.simulationCase :
+        self.config(text = "individu sphère", command =  lambda : change_simulation(self))
+    else :
+        self.config(text = "individu carré", command =  lambda : change_simulation(self))
+    Var.simulationCase=not(Var.simulationCase)
+    self.pack(fill=X)
+    return
+
 def recalcule(label):
     '''Recalcule le chmp de potentiel'''
     recalcule_champ_potentiel()
-    stat_dMaxCase(label)
+    stat_dMaxCase(label,1)
+    stat_dMaxCase(label,2)
     return
-    
+
 ## bouton_indiv
 def place_indiv(terrain, label):
     '''Place des individus aux hasard sur le terrain et met a jour le nombre d'individus affiché par label'''
@@ -114,7 +119,10 @@ def place_indiv(terrain, label):
             Var.NIndiv = 300
         else :
             Var.NIndiv = int(label.get())
-    init_indiv(terrain)
+    if Var.simulationCase:
+        init_indiv_carre(terrain)
+    else:
+        init_indiv(terrain)
     return
 
 ## bouton_pause
@@ -134,6 +142,10 @@ def reset_temps() :
     Var.tps = 0
     return
 
+
+
+
+
 ##Évènements
 
 ##Souris
@@ -150,10 +162,13 @@ def coordonnees_pointeur(x,y) :
 def clic_gauche(event, taille_pinceau, terrain):
     coordonnees_pointeur(event.x,event.y)
     if(Var.placeIndiv) :
-        pose_indiv(event.x,event.y,terrain)
+        if Var.simulationCase:
+            pose_indiv_carre(event.x,event.y,terrain)
+        else:
+            pose_indiv(event.x,event.y,terrain)
     else :
         if(Var.typeCase!=1) :
-            wavefront(Var.xPointeur,Var.yPointeur, [], [change_case_action], taille_pinceau.get(), Var.typePinceau)
+            wavefront(Var.xPointeur,Var.yPointeur, [], [change_case_action], taille_pinceau.get(), True)
         else :
             creer_sortie(Var.xPointeur,Var.yPointeur)
     return
@@ -163,21 +178,28 @@ def deplacement_clic_gauche(event, taille_pinceau) :
     if(Var.placeIndiv == False) :
         if(Var.nvCase) :
             if(Var.typeCase!=1) :
-                wavefront(Var.xPointeur,Var.yPointeur, [], [change_case_action], taille_pinceau.get(), Var.typePinceau)
+                wavefront(Var.xPointeur,Var.yPointeur, [], [change_case_action], taille_pinceau.get(), True)
             else :
                 creer_sortie(Var.xPointeur,Var.yPointeur)
     return
-    
+
 def efface_case(x,y):
     if(Var.TCase[y,x].type == 1) :
-        Var.LSortie.remove([C.x,C.y])
-    Var.TCase[y,x].score = -1
+        if Var.choixSortie==1:
+            Var.LSortie1.remove([C.x,C.y])
+        else:
+            Var.LSortie2.remove([C.x,C.y])
+    Var.TCase[y,x].score = [inf,inf]
     Var.TCase[y,x].type = 0
     Var.TCase[y,x].rafraichir()
-    
+
 def clic_droit(event):
     coordonnees_pointeur(event.x,event.y)
-    efface_case(Var.xPointeur,Var.yPointeur)
+    print(event.x,event.y)
+    print(Var.xPointeur,Var.yPointeur)
+    print('d',Var.TCase[Var.yPointeur,Var.xPointeur].score)
+    print('t',Var.TCase[Var.yPointeur,Var.xPointeur].type)
+    #efface_case(Var.xPointeur,Var.yPointeur)
     return
 
 def deplacement_clic_droit(event) :
