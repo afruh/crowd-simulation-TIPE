@@ -54,17 +54,18 @@ menu3.add_separator()
 menu3.add_command(label= "Grille", command = affiche_grille)
 menubar.add_cascade(label="Affichage", menu=menu3)
 
-menu4 = Menu(menubar, tearoff=0)
-menu4.add_command(label="Manuel", command = lambda : os.startfile("..\Memoire.pdf"))
-menu4.add_command(label="A propos", command=info)
-menubar.add_cascade(label="Aide", menu=menu4)
-
 
 tk.config(menu=menubar)
 
 ##Boite à outils (p1)
 Label(p1, text = "Boite à outils").pack(side = TOP)
 Frame(p1, height=2, bd=1, relief=SUNKEN).pack(fill=X, padx=5, pady=5)
+
+#Simulation individu
+Label(p1, text = "Simulation individu").pack()
+bouton_changeSimulation = Button(p1, text = "individu sphère", command =  lambda : change_simulation(bouton_changeSimulation))
+bouton_changeSimulation.pack(fill=X)
+
 
 #Pinceau
 Label(p1, text = "Pinceau").pack()
@@ -82,11 +83,23 @@ liste.pack(fill=X)
 Label(p1, text = "Taille du pinceau").pack()
 taille_pinceau = Scale(p1,from_=1, to=10, orient=HORIZONTAL)
 taille_pinceau.pack(fill=X)
+#quelle sortie
+Label(p1, text = "groupe ").pack()
+etiqs = ['1', '2']
+B=StringVar()
+B.set(1)
+def changeSortie(B):
+    Var.choixSortie=int(B.get())
+    print(Var.choixSortie)
+    return
+for i in range(2):
+    Radioboutton = Radiobutton(p1, variable=B, text=etiqs[i], value=i+1, command=lambda: changeSortie(B))
+    Radioboutton.pack(fill=X)
 
-#Type de pinceau
-Label(p1, text = "Forme du pinceau").pack()
-bouton_typePinceau = Button(p1, text = "Croix", command = lambda : change_typePinceau(bouton_typePinceau))
-bouton_typePinceau.pack(fill=X)
+#Type de
+Label(p1, text = "Forme du voisinnage").pack()
+bouton_typeDiagonale = Button(p1, text = "restreint", command = lambda : change_typeDiagonale(bouton_typeDiagonale))
+bouton_typeDiagonale.pack(fill=X)
 
 Frame(p1, height=2, bd=1, relief=SUNKEN).pack(fill=X, padx=5, pady=5)
 
@@ -165,7 +178,10 @@ liste.bind("<<ListboxSelect>>", selection)
 ##Fonction de mise à jour
 def update():
     if not(Var.pause) :
-        bouge_indiv()
+        if Var.simulationCase:
+            bouge_indiv_carre()
+        else:
+            bouge_indiv()
         sortir_indiv(terrain)
         stat_nbIndiv(label_nbIndiv)
 
@@ -173,7 +189,6 @@ def update():
             Var.tps += Var.TpsRaffraichissement/1000
             tpsStr = time.strftime("%M:%S", time.gmtime(Var.tps))
             label_temps.config(text = tpsStr)
-    tk.update_idletasks()
     tk.after(Var.TpsRaffraichissement, update)
 
 ##Initialisation
