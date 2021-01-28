@@ -4,6 +4,7 @@
 import numpy as np
 from Vect2D import *
 
+
 # Variable de la fenêtre
 largeur = 50                                # largeur du terrain en nombre de cases
 hauteur = 30                                # hauteur du terrain en nombre de cases
