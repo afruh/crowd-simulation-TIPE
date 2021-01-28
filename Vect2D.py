@@ -67,7 +67,6 @@ class vect2D:
     # Méthodes
     def norme(self):
         '''Renvoit la norme d'un vecteur'''
-        #print(self.x,self.y,sqrt(self.x**2 + self.y**2))
         return sqrt(self.x**2 + self.y**2)
 
     def normalise(self):
@@ -75,21 +74,7 @@ class vect2D:
         if self.norme() != 0 :
             return (1 / self.norme()) * self
         return self
-    #angle par rapport à x ou y
-    def cos(self,selonX):
-        if selonX:
-            return self.x/norme(self)
-        return self.y/norme(self)
-    def sin(self,selonX):
-        if selonX:
-            return self.y/norme(self)
-        return self.x/norme(self)
-    def tan(self,selonX):
-        if selonX:
-            return self.y/self.x
-        return self.x/self.y
 ## Fonctions sur les vecteurs :
-
 def p_scal(vecteur1, vecteur2):
     '''Calcule le produit scalaire de deux vecteurs'''
     return vecteur1.x * vecteur2.x + vecteur1.y * vecteur2.y
@@ -97,3 +82,4 @@ def p_scal(vecteur1, vecteur2):
 def projection(vecteur1, vecteur2):
     '''Calcule la projection du vecteur 1 sur l'axe dirigé par le vecteur 2'''
     return p_scal(vecteur1, vecteur2.normalise()) * vecteur2.normalise()
+
