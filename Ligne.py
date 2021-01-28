@@ -33,3 +33,4 @@ def cacher_ligne():
             Var.Tligne[y,x].pos2 = vect2D()
             Var.Tligne[y,x].rafraichir()
     return
+
